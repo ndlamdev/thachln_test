@@ -1,0 +1,226 @@
+<!--
+* Author: Nguyen Dinh Lam
+* Email: kiminonawa1305@gmail.com
+* Phone number: +84 855354919
+* Create at: 08/10/2025
+* User: kimin
+-->
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Number Calculator</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-primary">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="card shadow-lg rounded-3">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <h1 class="display-4 fw-bold text-primary mb-2">
+                                <i class="bi bi-calculator"></i> Big Number Calculator
+                            </h1>
+                            <p class="text-muted">Tính tổng các số cực lớn với độ chính xác tuyệt đối</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="number1" class="form-label fw-semibold">
+                                <i class="bi bi-1-circle"></i> Số thứ nhất:
+                            </label>
+                            <input type="text" 
+                                   class="form-control form-control-lg font-monospace" 
+                                   id="number1" 
+                                   placeholder="Nhập số (chỉ các chữ số 0-9)" 
+                                   autocomplete="off">
+                        </div>
+
+                        <div class="text-center fs-1 text-primary fw-bold my-3">
+                            <i class="bi bi-plus-circle-fill"></i>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="number2" class="form-label fw-semibold">
+                                <i class="bi bi-2-circle"></i> Số thứ hai:
+                            </label>
+                            <input type="text" 
+                                   class="form-control form-control-lg font-monospace" 
+                                   id="number2" 
+                                   placeholder="Nhập số (chỉ các chữ số 0-9)" 
+                                   autocomplete="off">
+                        </div>
+
+                        <div class="d-grid gap-2 mb-3">
+                            <button class="btn btn-primary btn-lg" onclick="calculate()" id="btnCalculate">
+                                <i class="bi bi-calculator-fill"></i>
+                                <span id="btnText"> Tính toán</span>
+                            </button>
+                        </div>
+
+                        <div class="d-none text-center py-3" id="loading">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="text-muted mt-2 mb-0">Đang tính toán...</p>
+                        </div>
+
+                        <div class="alert alert-danger alert-dismissible fade d-none" role="alert" id="errorMessage">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span id="errorText"></span>
+                            <button type="button" class="btn-close" onclick="hideError()"></button>
+                        </div>
+
+                        <div class="d-none mt-4" id="resultSection">
+                            <div class="card bg-light border-0">
+                                <div class="card-body p-4">
+                                    <div class="mb-3">
+                                        <small class="text-uppercase fw-bold text-secondary d-block mb-2">
+                                            <i class="bi bi-bar-chart-fill"></i> Kết quả:
+                                        </small>
+                                        <div class="card bg-white border shadow-sm">
+                                            <div class="card-body">
+                                                <h4 class="font-monospace text-break mb-0" id="resultValue">0</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card bg-white border shadow-sm">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="fw-semibold text-muted">
+                                                    <i class="bi bi-stopwatch"></i> Thời gian thực hiện:
+                                                </span>
+                                                <span class="badge bg-primary fs-6" id="executionTime">0 ms</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <p class="text-white mb-0">
+                        <i class="bi bi-code-slash"></i> 
+                        Made with <i class="bi bi-heart-fill text-danger"></i> by Nguyen Dinh Lam
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const resultSection = document.getElementById('resultSection');
+        const errorMessage = document.getElementById('errorMessage');
+        const loading = document.getElementById('loading');
+        const btnCalculate = document.getElementById('btnCalculate');
+
+        function validateInput(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+
+
+        Array.from(document.getElementsByTagName('input')).forEach(input => {
+            input.addEventListener('input', function(e) {
+                validateInput(e.target);
+            });
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') calculate();
+            });
+        });
+
+        async function calculate() {
+            const number1 = document.getElementById('number1').value.trim();
+            const number2 = document.getElementById('number2').value.trim();
+
+            resetStatus();
+
+            if (!validateData(number1, number2)) return;
+
+            loading.classList.remove('d-none');
+            btnCalculate.disabled = true;
+
+            try {
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        number1: number1,
+                        number2: number2
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Lỗi khi tính toán!');
+                }
+
+                const data = await response.json();
+
+                // Display result
+                document.getElementById('resultValue').textContent = data.result;
+                document.getElementById('executionTime').textContent = data.executionTime.toFixed(6) + ' ms';
+                resultSection.classList.remove('d-none');
+
+            } catch (error) {
+                showError('Đã xảy ra lỗi: ' + error.message);
+            } finally {
+                loading.classList.add('d-none');
+                btnCalculate.disabled = false;
+            }
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = ' ' + message;
+            errorMessage.classList.remove('d-none');
+            errorMessage.classList.add('show');
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+                setTimeout(() => {
+                    errorMessage.classList.add('d-none');
+                }, 150);
+            }, 5000);
+        }
+
+        function hideError() {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.classList.remove('show');
+            setTimeout(() => {
+                errorMessage.classList.add('d-none');
+            }, 150);
+        }
+
+        function validateData(number1, number2){
+            if (!number1 || !number2) {
+                showError('Vui lòng nhập cả hai số!');
+                return false;
+            }
+
+            if (!/^[0-9]+$/.test(number1) || !/^[0-9]+$/.test(number2)) {
+                showError('Chỉ được nhập các chữ số từ 0-9!');
+                return false;
+            }
+
+            return true;
+        }
+
+        function resetStatus(){
+            resultSection.classList.add('d-none');
+            errorMessage.classList.remove('show');
+            errorMessage.classList.add('d-none');
+        }
+    </script>
+</body>
+</html>
