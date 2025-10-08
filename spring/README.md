@@ -27,7 +27,7 @@
 
 #### Trên Windows:
 ```bash
-gradlew bootRun
+.\gradlew bootRun
 ```
 
 #### Trên Linux/Mac:
@@ -38,6 +38,23 @@ gradlew bootRun
 ### Sử dụng Gradle đã cài đặt:
 ```bash
 gradle bootRun
+```
+
+### Build dự án và chạy
+
+#### Build dự án
+```bash
+./gradlew build -x test
+```
+
+#### Chạy dự án trên Windows:
+```bash
+java -jar .\build\libs\spring-0.0.1-SNAPSHOT.jar
+```
+
+#### Chạy dự án trên Linux/Mac:
+```bash
+java -jar ./build/libs/spring-0.0.1-SNAPSHOT.jar
 ```
 
 ### Sử dụng IntelliJ IDEA:
@@ -117,7 +134,7 @@ Tính tổng 2 số lớn
 
 ## 👨‍💻 Tác giả
 - **Name**: Nguyen Dinh Lam
-- **Email**: kiminonawa1305@gmail.com
+- **Email**: ndlam.dev@gmail.com
 - **Phone**: +84 855354919
 
 ## 📄 License

@@ -37,7 +37,7 @@ Hãy phát triển một ứng dụng Web với các công nghệ sau:
 
 1. Hoàn thành Task 1 và đẩy code lên nhánh **"core"**
 2. Hoàn thành Task 2 với ứng dụng web hoàn chỉnh
-3. Bổ sung tài liệu hướng dẫn (README.md, test.md, v.v.)
+3. Bổ sung tài liệu hướng dẫn (README.md)
 4. Đẩy toàn bộ lên GIT Server
 5. Đảm bảo code có thể build và chạy thành công
 
@@ -57,4 +57,4 @@ Hãy phát triển một ứng dụng Web với các công nghệ sau:
 - Đảm bảo code được test kỹ lưỡng
 - Nên có unit test cho các chức năng chính
 - Ghi chú rõ ràng các bước build và deploy ứng dụng
-
+- <strong>Mọi đoạn code đều được viết và chạy bằng `java 21`</strong>
